@@ -12,6 +12,8 @@
     tools:showIn="@layout/activity_main">
 
 
+
+
     <gr.escsoft.michaelprimez.searchablespinner.SearchableSpinner
         android:id="@+id/SearchableSpinner"
         android:layout_width="wrap_content"

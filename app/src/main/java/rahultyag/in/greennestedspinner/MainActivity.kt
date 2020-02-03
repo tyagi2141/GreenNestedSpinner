@@ -1,5 +1,6 @@
 package rahultyag.`in`.greennestedspinner
 
+import Country
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -20,13 +21,18 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var mSearchableSpinner: SearchableSpinner? = null
+    private var mSpinner_One: SearchableSpinner? = null
+    private var mSpinner_One_Array_Adapter: SimpleArrayListAdapter? = null
+
     private var mSearchableSpinner1: SearchableSpinner? = null
-    private var mSearchableSpinner2: SearchableSpinner? = null
+   private var mSearchableSpinner2: SearchableSpinner? = null
     private var mSearchableSpinner3: SearchableSpinner? = null
+
     private var mSimpleListAdapter: SimpleListAdapter? = null
-    private var mSimpleArrayListAdapter: SimpleArrayListAdapter? = null
     private val mStrings = ArrayList<String>()
+  //  private val country = List<Country>()
+
+
 
     val mAPIClient by lazy {
         APIClient.create()
@@ -44,28 +50,14 @@ class MainActivity : AppCompatActivity() {
         initListValues()
 
   //=======================one =====================================================
-        mSimpleArrayListAdapter = SimpleArrayListAdapter(this, mStrings)
-        mSearchableSpinner = findViewById(R.id.SearchableSpinner) as SearchableSpinner
-        mSearchableSpinner!!.setAdapter(mSimpleArrayListAdapter)
-        mSearchableSpinner!!.setOnItemSelectedListener(mOnItemSelectedListener)
-        mSearchableSpinner!!.setStatusListener(object : IStatusListener {
+        mSpinner_One_Array_Adapter = SimpleArrayListAdapter(this, mStrings)
+
+        mSpinner_One = findViewById(R.id.SearchableSpinner) as SearchableSpinner
+        mSpinner_One!!.setAdapter(mSpinner_One_Array_Adapter)
+        mSpinner_One!!.setOnItemSelectedListener(mOnItemSelectedListener)
+        mSpinner_One!!.setStatusListener(object : IStatusListener {
             override fun spinnerIsOpening() {
                 mSearchableSpinner1!!.hideEdit()
-                mSearchableSpinner2!!.hideEdit()
-            }
-
-            override fun spinnerIsClosing() {}
-        })
-// ================================== two ========================================================================
-        mSimpleListAdapter = SimpleListAdapter(this, mStrings)
-
-        //  mSimpleListAdapter=SimpleListAdapter(this,mStrings)
-        mSearchableSpinner1 = findViewById(R.id.SearchableSpinner1) as SearchableSpinner
-        mSearchableSpinner1!!.setAdapter(mSimpleListAdapter)
-        mSearchableSpinner1!!.setOnItemSelectedListener(mOnItemSelectedListener)
-        mSearchableSpinner1!!.setStatusListener(object : IStatusListener {
-            override fun spinnerIsOpening() {
-                mSearchableSpinner!!.hideEdit()
                 mSearchableSpinner2!!.hideEdit()
             }
 
@@ -73,11 +65,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         mSearchableSpinner2 = findViewById(R.id.SearchableSpinner2) as SearchableSpinner
-        mSearchableSpinner2!!.setAdapter(mSimpleListAdapter)
+        mSearchableSpinner2!!.setAdapter(mSpinner_One_Array_Adapter)
         mSearchableSpinner2!!.setOnItemSelectedListener(mOnItemSelectedListener)
         mSearchableSpinner2!!.setStatusListener(object : IStatusListener {
             override fun spinnerIsOpening() {
-                mSearchableSpinner!!.hideEdit()
+                mSpinner_One!!.hideEdit()
                 mSearchableSpinner1!!.hideEdit()
             }
 
@@ -85,11 +77,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         mSearchableSpinner3 = findViewById(R.id.SearchableSpinner3) as SearchableSpinner
-        mSearchableSpinner3!!.setAdapter(mSimpleListAdapter)
+        mSearchableSpinner3!!.setAdapter(mSpinner_One_Array_Adapter)
         mSearchableSpinner3!!.setOnItemSelectedListener(mOnItemSelectedListener)
         mSearchableSpinner3!!.setStatusListener(object : IStatusListener {
             override fun spinnerIsOpening() {
-                mSearchableSpinner!!.hideEdit()
+                mSpinner_One!!.hideEdit()
                 mSearchableSpinner3!!.hideEdit()
             }
 
@@ -107,19 +99,35 @@ class MainActivity : AppCompatActivity() {
 
                 Log.e("responseData", it.responseData.area.toString()+"  \n =====  ")
 
+              //  country.add(it.responseData.country)
+                mSimpleListAdapter=SimpleListAdapter(this,it.responseData.country)
+             //   mSimpleListAdapter = SimpleListAdapter(this, it.responseData.country)
+                mSearchableSpinner1 = findViewById(R.id.SearchableSpinner1) as SearchableSpinner
+                mSearchableSpinner1!!.setAdapter(mSimpleListAdapter)
 
+                mSearchableSpinner1!!.setOnItemSelectedListener(mOnItemSelectedListener)
+                mSearchableSpinner1!!.setStatusListener(object : IStatusListener {
+                    override fun spinnerIsOpening() {
+                        mSpinner_One!!.hideEdit()
+                        mSearchableSpinner2!!.hideEdit()
+                    }
+
+                    override fun spinnerIsClosing() {}
+                })
 
             }, {
                 Log.d("error", "errors")
             })
+
+// ================================== two ========================================================================
 
 
     }
 
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (!mSearchableSpinner!!.isInsideSearchEditText(event)) {
-            mSearchableSpinner!!.hideEdit()
+        if (!mSpinner_One!!.isInsideSearchEditText(event)) {
+            mSpinner_One!!.hideEdit()
         }
         if (!mSearchableSpinner1!!.isInsideSearchEditText(event)) {
             mSearchableSpinner1!!.hideEdit()
@@ -210,7 +218,7 @@ class MainActivity : AppCompatActivity() {
 // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
         if (id == R.id.action_reset) {
-            mSearchableSpinner!!.setSelectedItem(0)
+            mSpinner_One!!.setSelectedItem(0)
             mSearchableSpinner1!!.setSelectedItem(0)
             mSearchableSpinner2!!.setSelectedItem(0)
             return true

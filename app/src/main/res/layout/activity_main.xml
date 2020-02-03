@@ -8,20 +8,18 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        android:orientation="vertical">
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme"/>
-
-    </com.google.android.material.appbar.AppBarLayout>
+            android:layout_height="wrap_content"
+            >
 
     <include layout="@layout/content_main"/>
 
+        </ScrollView>
+    </LinearLayout>
 </LinearLayout>

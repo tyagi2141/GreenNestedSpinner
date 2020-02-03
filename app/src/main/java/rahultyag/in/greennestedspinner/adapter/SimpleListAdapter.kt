@@ -1,5 +1,6 @@
 package rahultyag.`in`.greennestedspinner.adapter
 
+import Country
 import android.content.Context
 import android.graphics.Color
 import android.text.TextUtils
@@ -16,11 +17,11 @@ import java.util.*
 
 class SimpleListAdapter(
     private val mContext: Context,
-    strings: ArrayList<String>
+    strings: List<Country>
 ) :
     BaseAdapter(), Filterable, ISpinnerSelectedView {
-    private val mBackupStrings: ArrayList<String>
-    private var mStrings: ArrayList<String>?
+    private val mBackupStrings: List<Country>
+    private var mStrings: List<Country>?
     private val mStringFilter = StringFilter()
     override fun getCount(): Int {
         return if (mStrings == null) 0 else mStrings!!.size + 1
@@ -50,7 +51,7 @@ class SimpleListAdapter(
             val dispalyName =
                 view.findViewById<View>(R.id.TxtVw_DisplayName) as TextView
             letters.setImageDrawable(getTextDrawable(mStrings!![position - 1]))
-            dispalyName.text = mStrings!![position - 1]
+            dispalyName.text = mStrings!![position - 1].toString()
         }
         return view!!
     }
@@ -66,7 +67,7 @@ class SimpleListAdapter(
             val dispalyName =
                 view.findViewById<View>(R.id.TxtVw_DisplayName) as TextView
             letters.setImageDrawable(getTextDrawable(mStrings!![position - 1]))
-            dispalyName.text = mStrings!![position - 1]
+            dispalyName.text = mStrings!![position - 1].toString()
         }
         return view!!
     }
@@ -75,9 +76,9 @@ class SimpleListAdapter(
         return View.inflate(mContext, R.layout.view_list_no_selection_item, null)
     }
 
-    private fun getTextDrawable(displayName: String): TextDrawable? {
+    private fun getTextDrawable(displayName: Country): TextDrawable? {
         var drawable: TextDrawable? = null
-        drawable = if (!TextUtils.isEmpty(displayName)) {
+        drawable = if (!TextUtils.isEmpty(displayName.country)) {
             val color2: Int = ColorGenerator.MATERIAL.getColor(displayName)
             TextDrawable.builder()
                 .beginConfig()
@@ -87,7 +88,7 @@ class SimpleListAdapter(
                 .toUpperCase()
                 .endConfig()
                 .round()
-                .build(displayName.substring(0, 1), color2)
+                .build(displayName.country.substring(0, 1), color2)
         } else {
             TextDrawable.builder()
                 .beginConfig()
@@ -115,8 +116,8 @@ class SimpleListAdapter(
             val filterStrings =
                 ArrayList<String>()
             for (text in mBackupStrings) {
-                if (text.toLowerCase().contains(constraint)) {
-                    filterStrings.add(text)
+                if (text.country.toLowerCase().contains(constraint)) {
+                    filterStrings.add(text.country)
                 }
             }
             filterResults.count = filterStrings.size
@@ -128,7 +129,7 @@ class SimpleListAdapter(
             constraint: CharSequence,
             results: FilterResults
         ) {
-            mStrings = results.values as ArrayList<String>
+            mStrings = results.values as List<Country>
             notifyDataSetChanged()
         }
     }
