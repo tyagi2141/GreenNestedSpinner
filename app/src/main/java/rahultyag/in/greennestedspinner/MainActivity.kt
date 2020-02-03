@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private var mSimpleListAdapter: SimpleListAdapter? = null
     private val mStrings = ArrayList<String>()
-  //  private val country = List<Country>()
+   private var country = ArrayList<String>()
 
 
 
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
   //=======================one =====================================================
         mSpinner_One_Array_Adapter = SimpleArrayListAdapter(this, mStrings)
-
+      //  mSimpleListAdapter=SimpleListAdapter(this,country)
         mSpinner_One = findViewById(R.id.SearchableSpinner) as SearchableSpinner
         mSpinner_One!!.setAdapter(mSpinner_One_Array_Adapter)
         mSpinner_One!!.setOnItemSelectedListener(mOnItemSelectedListener)
@@ -89,19 +89,25 @@ class MainActivity : AppCompatActivity() {
         })
 
 
+
         //===============================================================================================
 
 
         mAPIClient.getData()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({
+            .subscribe {
 
-                Log.e("responseData", it.responseData.area.toString()+"  \n =====  ")
+                Log.e("responseData", it.responseData.area.toString() + "  \n =====  ")
 
-              //  country.add(it.responseData.country)
-                mSimpleListAdapter=SimpleListAdapter(this,it.responseData.country)
-             //   mSimpleListAdapter = SimpleListAdapter(this, it.responseData.country)
+               // country= it.responseData.country as ArrayList<Country>
+                for (i in 0 until it.responseData.country.size) {
+                    val item = it.responseData.country.get(i)
+                    country.add(item.country)
+                    // Your code here
+                }
+                Log.e("bdhvhdbfvdfv",country.toString());
+                mSimpleListAdapter = SimpleListAdapter(this,country)
                 mSearchableSpinner1 = findViewById(R.id.SearchableSpinner1) as SearchableSpinner
                 mSearchableSpinner1!!.setAdapter(mSimpleListAdapter)
 
@@ -115,10 +121,7 @@ class MainActivity : AppCompatActivity() {
                     override fun spinnerIsClosing() {}
                 })
 
-            }, {
-                Log.d("error", "errors")
-            })
-
+            }
 // ================================== two ========================================================================
 
 
@@ -144,11 +147,7 @@ class MainActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                Toast.makeText(
-                    this@MainActivity,
-                    "Item on position " + position + " : " + mSimpleListAdapter!!.getItem(position) + " Selected",
-                    Toast.LENGTH_SHORT
-                ).show()
+               // Toast.makeText(this@MainActivity, "Item on position " + position + " : " + mSimpleListAdapter!!.getItem(position) + " Selected", Toast.LENGTH_SHORT).show()
             }
 
             override fun onNothingSelected() {
