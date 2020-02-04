@@ -1,6 +1,8 @@
 package rahultyag.`in`.greennestedspinner
 
-import Country
+import ResponseData
+import android.content.Context
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -9,7 +11,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import gr.escsoft.michaelprimez.searchablespinner.SearchableSpinner
 import gr.escsoft.michaelprimez.searchablespinner.interfaces.IStatusListener
 import gr.escsoft.michaelprimez.searchablespinner.interfaces.OnItemSelectedListener
@@ -19,37 +20,65 @@ import rahultyag.`in`.greennestedspinner.adapter.SimpleArrayListAdapter
 import rahultyag.`in`.greennestedspinner.adapter.SimpleListAdapter
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
 
+class MainActivity : AppCompatActivity() {
     private var mSpinner_One: SearchableSpinner? = null
     private var mSpinner_One_Array_Adapter: SimpleArrayListAdapter? = null
 
     private var mSearchableSpinner1: SearchableSpinner? = null
-   private var mSearchableSpinner2: SearchableSpinner? = null
+    private var mSearchableSpinner2: SearchableSpinner? = null
     private var mSearchableSpinner3: SearchableSpinner? = null
+    var context= SearchableSpinnerApp.applicationContext()
 
     private var mSimpleListAdapter: SimpleListAdapter? = null
     private val mStrings = ArrayList<String>()
-  //  private val country = List<Country>()
-
-
+    //  private val country = List<Country>()
 
     val mAPIClient by lazy {
         APIClient.create()
     }
+    var mDb: SearchableSpinnerApp.Companion = SearchableSpinnerApp
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-       // val toolbar: Toolbar = findViewById(R.id.toolbar) as Toolbar
+        // val toolbar: Toolbar = findViewById(R.id.toolbar) as Toolbar
         //setSupportActionBar(toolbar)
+       // var context: Context = SearchableSpinnerApp.applicationContext()
 
-
-
+      //  mDb= AppDatabase.getDatabase(this)!!
 
         initListValues()
 
-  //=======================one =====================================================
+        mAPIClient.getData()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+                Log.e("responseData", it.responseData.area.toString() + "  \n =====  ")
+                saveData().execute(it.responseData)
+
+                //  country.add(it.responseData.country)
+              //  mSimpleListAdapter = SimpleListAdapter(this, it.responseData.country)
+                //   mSimpleListAdapter = SimpleListAdapter(this, it.responseData.country)
+                mSearchableSpinner1 = findViewById(R.id.SearchableSpinner1) as SearchableSpinner
+                mSearchableSpinner1!!.setAdapter(mSimpleListAdapter)
+
+                mSearchableSpinner1!!.setOnItemSelectedListener(mOnItemSelectedListener)
+                mSearchableSpinner1!!.setStatusListener(object : IStatusListener {
+                    override fun spinnerIsOpening() {
+                        mSpinner_One!!.hideEdit()
+                        mSearchableSpinner2!!.hideEdit()
+                    }
+
+                    override fun spinnerIsClosing() {}
+                })
+
+            }, {
+                Log.d("error", "errors")
+            })
+
+        //=======================one =====================================================
         mSpinner_One_Array_Adapter = SimpleArrayListAdapter(this, mStrings)
 
         mSpinner_One = findViewById(R.id.SearchableSpinner) as SearchableSpinner
@@ -92,38 +121,59 @@ class MainActivity : AppCompatActivity() {
         //===============================================================================================
 
 
-        mAPIClient.getData()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-
-                Log.e("responseData", it.responseData.area.toString()+"  \n =====  ")
-
-              //  country.add(it.responseData.country)
-                mSimpleListAdapter=SimpleListAdapter(this,it.responseData.country)
-             //   mSimpleListAdapter = SimpleListAdapter(this, it.responseData.country)
-                mSearchableSpinner1 = findViewById(R.id.SearchableSpinner1) as SearchableSpinner
-                mSearchableSpinner1!!.setAdapter(mSimpleListAdapter)
-
-                mSearchableSpinner1!!.setOnItemSelectedListener(mOnItemSelectedListener)
-                mSearchableSpinner1!!.setStatusListener(object : IStatusListener {
-                    override fun spinnerIsOpening() {
-                        mSpinner_One!!.hideEdit()
-                        mSearchableSpinner2!!.hideEdit()
-                    }
-
-                    override fun spinnerIsClosing() {}
-                })
-
-            }, {
-                Log.d("error", "errors")
-            })
-
 // ================================== two ========================================================================
-
 
     }
 
+    class saveData() : AsyncTask<ResponseData, Void, Void>() {
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+
+
+        }
+        override fun doInBackground(vararg params: ResponseData?): Void? {
+            var mresponse = params[0]
+            //  Log.e("jhvchjdhfvhdfvjdre",""+params[0]!!.area.get(i))
+
+
+            for (x in 0 until mresponse!!.area.size) {
+                Log.e("jhvchjdhfvhdfvjdre", mresponse.area.get(x).area)
+                AppDatabase.getDatabase(SearchableSpinnerApp.applicationContext().applicationContext)!!.dao_data()
+                    .insertAllArea(mresponse!!.area.get(x))
+
+            }
+
+            for (x in 0 until mresponse!!.country.size) {
+                AppDatabase.getDatabase(SearchableSpinnerApp.applicationContext().applicationContext)!!.dao_data().insertAllCountry(
+                    mresponse.country[x]
+                )
+
+            }
+            for (x in 0 until mresponse!!.employee.size) {
+                AppDatabase.getDatabase(SearchableSpinnerApp.applicationContext().applicationContext)!!.dao_data().insertAllEmployee(
+                    mresponse.employee[x]
+                )
+            }
+            for (x in 0 until mresponse.region.size) {
+                AppDatabase.getDatabase(SearchableSpinnerApp.applicationContext().applicationContext)!!.dao_data().insertAllRegion(
+                    mresponse.region[x]
+                )
+            }
+            for (x in 0 until mresponse.zone.size) {
+                AppDatabase.getDatabase(SearchableSpinnerApp.applicationContext().applicationContext)!!.dao_data()
+                    .insertAllZone(mresponse.zone[x])
+            }
+            return null;
+        }
+
+
+
+        override fun onPostExecute(result: Void?) {
+            super.onPostExecute(result)
+        }
+
+    }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (!mSpinner_One!!.isInsideSearchEditText(event)) {
@@ -137,6 +187,7 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onTouchEvent(event)
     }
+
     private val mOnItemSelectedListener: OnItemSelectedListener =
         object : OnItemSelectedListener {
             override fun onItemSelected(
@@ -208,6 +259,7 @@ class MainActivity : AppCompatActivity() {
         mStrings.add("Margherita Pazos")
         mStrings.add("Yuk Fitts")
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean { // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -225,4 +277,6 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+
 }

@@ -38,7 +38,7 @@ class SimpleListAdapter(
 
     override fun getView(
         position: Int,
-        convertView: View,
+        convertView: View?,
         parent: ViewGroup
     ): View {
         var view: View? = null

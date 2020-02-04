@@ -1,8 +1,15 @@
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-
+@Entity(tableName = "Area")
 data class Area (
+	@PrimaryKey(autoGenerate = true)
+	var id: Int,
 
-	@SerializedName("area") val area : String,
-	@SerializedName("territory") val territory : String
+
+	@ColumnInfo @SerializedName("area") val area : String,
+	@ColumnInfo @SerializedName("territory") val territory : String
 )
